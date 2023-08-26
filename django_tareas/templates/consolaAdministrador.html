@@ -150,7 +150,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1 id="cargaId" style="display: none;"></h1>
-                <h5 class="modal-title">Crear nuevo usuario</h5>
+                <h5 class="modal-title">Editar usuario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -160,10 +160,34 @@
                     Crear los inputs necesarios para poder cargar la informacion
                     del usuario, indicar los label's de los campos apropiadamente
                 -->
+                <div class="row form-group justify-content-around mb-3">
+                    <div class="col-5">
+                        <label>Nombre :</label>
+                        <input class="form-control" type="text" name="nombreUsuario" required>
+                    </div>
+                    <div class="col-5">
+                        <label>Apellido :</label>
+                        <input class="form-control" type="text" name="apellidoUsuario" required>
+                    </div>
+                </div>
+                <div class="row form-group justify-content-around mb-3">
+                    <div class="col-5">
+                        <label>Email :</label>
+                        <input class="form-control" type="email" name="emailUsuario" required>
+                    </div>
+                    <div class="col-5">
+                        <label>Nro de celular :</label>
+                        <input class="form-control" type="text" name="nroCelular" required>
+                    </div>
+                    <div class="col-5">
+                        <label>Fecha  :</label>
+                        <input class="form-control" type="date" name="profesionUsuario" required>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="actualizarUsuario()">Registrar</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="actualizarUsuario()">Actualizar</button>
             </div>
         </div>
     </div>
