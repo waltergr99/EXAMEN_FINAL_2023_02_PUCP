@@ -10,7 +10,7 @@ import json
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-
+from reportlab.lib.pagesizes import letter
 # Create your views here.
 def index(request):
     if request.method == 'POST':
@@ -142,7 +142,18 @@ def conseguirInfoTarea(request):
         'idTarea':str(tareaSeleccionada.id),
         'comentariosTotales':comentariosTotales,
     })
-
+def conseguirInfoUsuario(request):
+    idUser = request.GET.get('idUser')
+    usuarioSeleccionada = datosUsuario.objects.get(id=idUser)
+    return JsonResponse({
+        'user':usuarioSeleccionada.user,
+        'tipoUsuario':usuarioSeleccionada.tipoUsuario,
+        'nroCelular':usuarioSeleccionada.nroCelular,
+        'profesionUsuario':usuarioSeleccionada.profesionUsuario,
+        'perfilUsuario':usuarioSeleccionada.perfilUsuario,
+        'fechaIngreso':usuarioSeleccionada.fechaIngreso.strftime("%d-%m-%Y"),
+        'idUser':str(usuarioSeleccionada.id)
+    })
 def eliminarTarea(request,idTarea,idUsuario):
     tareasInformacion.objects.get(id=idTarea).delete()
     return HttpResponseRedirect(reverse('django_tareas:verUsuario', kwargs={'ind':idUsuario}))
@@ -235,7 +246,7 @@ def publicarComentario(request):
         'resp':'ok'
     })
 
-def descargarReporteUsuarios(request):
+def descargarReporteUsuarios(nombre_archivo, usuarios, cantidad_usuarios, usuario_generador, tipo_usuarios_generador):
     """
     PREGUNTA 1
     En esta funcion debe generar un pdf con utilizando la libreria reportlab
@@ -256,6 +267,47 @@ def descargarReporteUsuarios(request):
     Tipo de usuarios que genera el reporte
     
     """
+    
+    # Crea un objeto Canvas para generar el PDF
+    c = canvas.Canvas(nombre_archivo, pagesize=letter)
+
+    # Agrega la descripción de cabecera
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(50, 750, "Logo de DJANGO")
+    c.drawString(250, 750, "Título: Reporte de usuarios")
+    c.drawString(450, 750, "Logo de PUCP")
+    c.setFont("Helvetica", 12)
+    c.drawString(50, 720, "Fecha de creación del reporte: <fecha>")
+    c.drawString(50, 700, f"Cantidad de usuarios: {cantidad_usuarios}")
+    c.drawString(50, 680, f"Usuario que genera el reporte: {usuario_generador}")
+    c.drawString(50, 660, f"Tipo de usuarios que genera el reporte: {tipo_usuarios_generador}")
+
+    # Agrega la tabla con la información de los usuarios
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(50, 620, "Usuarios")
+    c.setFont("Helvetica", 10)
+    c.drawString(50, 600, "Username")
+    c.drawString(150, 600, "Nombre")
+    c.drawString(250, 600, "Apellido")
+    c.drawString(350, 600, "Fecha de ingreso")
+    c.drawString(450, 600, "Número de celular")
+    c.drawString(550, 600, "Cantidad de tareas")
+    c.drawString(650, 600, "Tipo de usuario")
+
+    # Agrega los datos de los usuarios a la tabla
+    y = 580
+    for usuario in usuarios:
+        c.drawString(50, y, usuario["username"])
+        c.drawString(150, y, usuario["nombre"])
+        c.drawString(250, y, usuario["apellido"])
+        c.drawString(350, y, usuario["fecha_ingreso"])
+        c.drawString(450, y, usuario["numero_celular"])
+        c.drawString(550, y, str(usuario["cantidad_tareas"]))
+        c.drawString(650, y, usuario["tipo_usuario"])
+        y -= 20
+
+    # Guarda y cierra el PDF
+    c.save()
     nombreArchivo = 'reporteUsuarios.pdf'
     reporteUsuarios=open(nombreArchivo,'rb')
     return FileResponse(reporteUsuarios,as_attachment=True)

@@ -12,6 +12,7 @@ urlpatterns = [
     path('nuevaTarea/<str:ind>', views.nuevaTarea, name='nuevaTarea'),
     path('devolverMensaje', views.devolverMensaje, name='devolverMensaje'),
     path('conseguirInfoTarea',views.conseguirInfoTarea,name='conseguirInfoTarea'),
+    path('conseguirInfoUsuario',views.conseguirInfoUsuario,name='conseguirInfoUsuario'),
     path('eliminarTarea/<str:idTarea>&<str:idUsuario>',views.eliminarTarea,name='eliminarTarea'),
     path('descargarTareas/<str:idUsuario>',views.descargarTareas,name='descargarTareas'),
     path('react', views.react, name='react'),
