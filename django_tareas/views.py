@@ -142,7 +142,26 @@ def conseguirInfoTarea(request):
         'idTarea':str(tareaSeleccionada.id),
         'comentariosTotales':comentariosTotales,
     })
+def conseguirInfoUsuario(request):
 
+    idEditar = request.GET.get('idEditar')
+    usuarioEditado = datosUsuario.objects.get(id=idEditar)
+
+    nombreUsuario = request.POST.get('nombreUsuario')
+    
+    apellidoUsuario = request.POST.get('apellidoUsuario')
+    print(nombreUsuario)
+    return JsonResponse({
+        'profesionUsuario':usuarioEditado.profesionUsuario,
+        'perfilUsuario':usuarioEditado.perfilUsuario,
+        'nroCelular' : usuarioEditado.nroCelular,
+        'tipoUsuario' : usuarioEditado.tipoUsuario,
+        'user' :str(usuarioEditado.id),
+        'fechaIngreso' : usuarioEditado.fechaIngreso.strftime("%d-%m-%Y"),
+        'nombreUsuario' : nombreUsuario,
+        'apellidoUsuario' :apellidoUsuario
+     
+    })
 def eliminarTarea(request,idTarea,idUsuario):
     tareasInformacion.objects.get(id=idTarea).delete()
     return HttpResponseRedirect(reverse('django_tareas:verUsuario', kwargs={'ind':idUsuario}))
