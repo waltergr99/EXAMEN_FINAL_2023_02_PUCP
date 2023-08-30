@@ -24,8 +24,6 @@ def index(request):
             else:
                 return HttpResponseRedirect(reverse('django_tareas:verUsuario', kwargs={'ind':usuarioInfo.id}))
         else:
-                return HttpResponseRedirect(reverse('django_tareas:consolaAdministrador',kwargs={'ind':usuarioInfo.id}))
-    else:
             return HttpResponseRedirect(reverse('django_tareas:index'))
     return render(request,'ingresoUsuario.html')
 
@@ -144,18 +142,7 @@ def conseguirInfoTarea(request):
         'idTarea':str(tareaSeleccionada.id),
         'comentariosTotales':comentariosTotales,
     })
-def conseguirInfoUsuario(request):
-    idUser = request.GET.get('idUser')
-    usuarioSeleccionada = datosUsuario.objects.get(id=idUser)
-    return JsonResponse({
-        'user':usuarioSeleccionada.user,
-        'tipoUsuario':usuarioSeleccionada.tipoUsuario,
-        'nroCelular':usuarioSeleccionada.nroCelular,
-        'profesionUsuario':usuarioSeleccionada.profesionUsuario,
-        'perfilUsuario':usuarioSeleccionada.perfilUsuario,
-        'fechaIngreso':usuarioSeleccionada.fechaIngreso.strftime("%d-%m-%Y"),
-        'idUser':str(usuarioSeleccionada.id)
-    })
+
 def eliminarTarea(request,idTarea,idUsuario):
     tareasInformacion.objects.get(id=idTarea).delete()
     return HttpResponseRedirect(reverse('django_tareas:verUsuario', kwargs={'ind':idUsuario}))
@@ -248,68 +235,40 @@ def publicarComentario(request):
         'resp':'ok'
     })
 
-def descargarReporteUsuarios(request,idUsuario):
-    usuarioInformacion = User.objects.get(id=idUsuario)
-    tareasUsuario = tareasInformacion.objects.filter(usuarioRelacionado=usuarioInformacion).order_by('id')
-    nombreArchivo = 'tareas-' + f'{usuarioInformacion.username}' + '.pdf'
+def descargarReporteUsuarios(request,idUse):
+    """
+    PREGUNTA 1
+    En esta funcion debe generar un pdf con utilizando la libreria reportlab
+    Este reporte debe contener la informacion de todos los usuarios a excepcion
+    de la contraseña y debe mostrar tambien la cantidad de tareas de cada 
+    usuarios (Solo la cantidad no es necesario la descripcion de todas)
+
+    Usuarios Nombre Apellido
+    Username        Fecha de ingreso       Numero de celular
+    Cantidad de tareas              Tipo de usuario
+
+    Agregar una descripcion de cabecera de la siguiente forma
+
+    Logo de DJANGO      Titulo: Reporte de usuarios     Logo de PUCP
+    Fecha de creacion del reporte
+    Cantidad de usuarios
+    Usuario que genera el reporte
+    Tipo de usuarios que genera el reporte
+    
+    """
+    usuarioInformacionReporte = User.objects.get(id=idUse)
+    tareasUsuarios = datosUsuario.objects.filter(tipoUsuario=usuarioInformacionReporte).order_by('id')
+    nombreArchivo = 'reporte-' + f'Walter' + '.pdf'
 
     archivoPdf = canvas.Canvas(nombreArchivo,A4)
 
-
+    archivoPdf.drawImage('./django_tareas/static/logoApp.png',20, 700, width=140, height=80)
+    archivoPdf.drawImage('./django_tareas/static/logoPUCP.png',430, 700, width=140, height=80)
+    
     archivoPdf.setFont('Helvetica-Bold',25)
-    archivoPdf.drawCentredString(297.5,730,'Reporte de tareas')
+    archivoPdf.drawCentredString(297.5,730,'Reporte de Usuarios')
 
-    #Informacion del usuario
-    archivoPdf.setFont('Helvetica-Bold',12)
-    archivoPdf.drawString(40,620, 'Nombre de usuario')
-    archivoPdf.drawString(40,605, 'Primer nombre')
-    archivoPdf.drawString(40,590, 'Apellido')
-    archivoPdf.drawString(40,575, 'Email')
-
-    archivoPdf.drawString(155,620, ':')
-    archivoPdf.drawString(155,605, ':')
-    archivoPdf.drawString(155,590, ':')
-    archivoPdf.drawString(155,575, ':')
-
-    archivoPdf.setFont('Helvetica',12)
-    archivoPdf.drawString(160,620, f'{usuarioInformacion.username}')
-    archivoPdf.drawString(160,605, f'{usuarioInformacion.first_name}')
-    archivoPdf.drawString(160,590, f'{usuarioInformacion.last_name}')
-    archivoPdf.drawString(160,575, f'{usuarioInformacion.email}')
-
-    archivoPdf.setFont('Helvetica-Bold',12)
-    archivoPdf.drawString(300,620, 'Tipo de usuario')
-    archivoPdf.drawString(300,605, 'Profesion del usuario')
-    archivoPdf.drawString(300,590, 'Nro de celular')
-    archivoPdf.drawString(300,575, 'Fecha de ingreso')
-
-    archivoPdf.drawString(425,620, ':')
-    archivoPdf.drawString(425,605, ':')
-    archivoPdf.drawString(425,590, ':')
-    archivoPdf.drawString(425,575, ':')
-
-    archivoPdf.setFont('Helvetica',12)
-    archivoPdf.drawString(430,620, f'{usuarioInformacion.datosusuario.tipoUsuario}')
-    archivoPdf.drawString(430,605, f'{usuarioInformacion.datosusuario.profesionUsuario}')
-    archivoPdf.drawString(430,590, f'{usuarioInformacion.datosusuario.nroCelular}')
-    archivoPdf.drawString(430,575, f'{usuarioInformacion.datosusuario.fechaIngreso.strftime("%d-%m-%Y")}')
-
-    lista_x = [40,550]
-    lista_y = [500,540]
-    archivoPdf.setStrokeColorRGB(0,0,1)
-
-    for tarea in tareasUsuario:
-        archivoPdf.grid(lista_x,lista_y)
-        archivoPdf.setFont('Helvetica',12)
-        archivoPdf.drawString(lista_x[0] + 20, lista_y[1]-15, f'{tarea.fechaInicio}')
-        archivoPdf.drawString(lista_x[0] + 120, lista_y[1]-15, f'{tarea.fechaFin}')
-        archivoPdf.drawString(lista_x[0] + 220, lista_y[1]-15, f'{tarea.estadoTarea}')
-        archivoPdf.drawString(lista_x[0] + 20, lista_y[1]-35, f'{tarea.descripcionTarea}')
-        lista_y[0] = lista_y[0] - 60
-        lista_y[1] = lista_y[1] - 60
-    archivoPdf.save()
-
-
+ 
     nombreArchivo = 'reporteUsuarios.pdf'
     reporteUsuarios=open(nombreArchivo,'rb')
     return FileResponse(reporteUsuarios,as_attachment=True)

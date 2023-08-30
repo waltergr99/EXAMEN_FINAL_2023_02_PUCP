@@ -1,24 +1,5 @@
-function editarUsuario(idUser)
+function editarUsuario(idEditar)
 {
-    
-    fetch(`/conseguirInfoUsuario?idUser=${idUser}`)
-    .then(response => response.json())
-    .then(data => {
-        let fechaIngresoDetalle = document.getElementById('fechaIngresoDetalle')
-        let tipoUsuarioDetalle = document.getElementById('tipoUsuarioDetalle')
-        let nroCelularDetalle = document.getElementById('nroCelularDetalle')
-        let profesionUsuarioDetalle = document.getElementById('profesionUsuarioDetalle')
-        let perfilUsuarioDetalle = document.getElementById('perfilUsuarioDetalle')
-        let indUser = document.getElementById('indUser')
-
-
-        fechaIngresoDetalle.value = data.fechaIngreso
-        tipoUsuarioDetalle.value = data.tipoUsuario
-        nroCelularDetalle.value = data.nroCelular
-        profesionUsuarioDetalle = data.profesionUsuario
-        perfilUsuarioDetalle.value = data.perfilUsuario
-        indUser.innerHTML = data.idUser
-    })
     console.log(idEditar)
     /*
     PREGUNTA 3
