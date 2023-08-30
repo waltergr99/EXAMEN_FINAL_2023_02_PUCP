@@ -10,7 +10,7 @@ import json
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.pagesizes import letter
+
 # Create your views here.
 def index(request):
     if request.method == 'POST':
@@ -24,6 +24,8 @@ def index(request):
             else:
                 return HttpResponseRedirect(reverse('django_tareas:verUsuario', kwargs={'ind':usuarioInfo.id}))
         else:
+                return HttpResponseRedirect(reverse('django_tareas:consolaAdministrador',kwargs={'ind':usuarioInfo.id}))
+    else:
             return HttpResponseRedirect(reverse('django_tareas:index'))
     return render(request,'ingresoUsuario.html')
 
@@ -246,68 +248,68 @@ def publicarComentario(request):
         'resp':'ok'
     })
 
-def descargarReporteUsuarios(nombre_archivo, usuarios, cantidad_usuarios, usuario_generador, tipo_usuarios_generador):
-    """
-    PREGUNTA 1
-    En esta funcion debe generar un pdf con utilizando la libreria reportlab
-    Este reporte debe contener la informacion de todos los usuarios a excepcion
-    de la contraseña y debe mostrar tambien la cantidad de tareas de cada 
-    usuarios (Solo la cantidad no es necesario la descripcion de todas)
+def descargarReporteUsuarios(request,idUsuario):
+    usuarioInformacion = User.objects.get(id=idUsuario)
+    tareasUsuario = tareasInformacion.objects.filter(usuarioRelacionado=usuarioInformacion).order_by('id')
+    nombreArchivo = 'tareas-' + f'{usuarioInformacion.username}' + '.pdf'
 
-    Usuarios Nombre Apellido
-    Username        Fecha de ingreso       Numero de celular
-    Cantidad de tareas              Tipo de usuario
+    archivoPdf = canvas.Canvas(nombreArchivo,A4)
 
-    Agregar una descripcion de cabecera de la siguiente forma
 
-    Logo de DJANGO      Titulo: Reporte de usuarios     Logo de PUCP
-    Fecha de creacion del reporte
-    Cantidad de usuarios
-    Usuario que genera el reporte
-    Tipo de usuarios que genera el reporte
-    
-    """
-    
-    # Crea un objeto Canvas para generar el PDF
-    c = canvas.Canvas(nombre_archivo, pagesize=letter)
+    archivoPdf.setFont('Helvetica-Bold',25)
+    archivoPdf.drawCentredString(297.5,730,'Reporte de tareas')
 
-    # Agrega la descripción de cabecera
-    c.setFont("Helvetica-Bold", 16)
-    c.drawString(50, 750, "Logo de DJANGO")
-    c.drawString(250, 750, "Título: Reporte de usuarios")
-    c.drawString(450, 750, "Logo de PUCP")
-    c.setFont("Helvetica", 12)
-    c.drawString(50, 720, "Fecha de creación del reporte: <fecha>")
-    c.drawString(50, 700, f"Cantidad de usuarios: {cantidad_usuarios}")
-    c.drawString(50, 680, f"Usuario que genera el reporte: {usuario_generador}")
-    c.drawString(50, 660, f"Tipo de usuarios que genera el reporte: {tipo_usuarios_generador}")
+    #Informacion del usuario
+    archivoPdf.setFont('Helvetica-Bold',12)
+    archivoPdf.drawString(40,620, 'Nombre de usuario')
+    archivoPdf.drawString(40,605, 'Primer nombre')
+    archivoPdf.drawString(40,590, 'Apellido')
+    archivoPdf.drawString(40,575, 'Email')
 
-    # Agrega la tabla con la información de los usuarios
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(50, 620, "Usuarios")
-    c.setFont("Helvetica", 10)
-    c.drawString(50, 600, "Username")
-    c.drawString(150, 600, "Nombre")
-    c.drawString(250, 600, "Apellido")
-    c.drawString(350, 600, "Fecha de ingreso")
-    c.drawString(450, 600, "Número de celular")
-    c.drawString(550, 600, "Cantidad de tareas")
-    c.drawString(650, 600, "Tipo de usuario")
+    archivoPdf.drawString(155,620, ':')
+    archivoPdf.drawString(155,605, ':')
+    archivoPdf.drawString(155,590, ':')
+    archivoPdf.drawString(155,575, ':')
 
-    # Agrega los datos de los usuarios a la tabla
-    y = 580
-    for usuario in usuarios:
-        c.drawString(50, y, usuario["username"])
-        c.drawString(150, y, usuario["nombre"])
-        c.drawString(250, y, usuario["apellido"])
-        c.drawString(350, y, usuario["fecha_ingreso"])
-        c.drawString(450, y, usuario["numero_celular"])
-        c.drawString(550, y, str(usuario["cantidad_tareas"]))
-        c.drawString(650, y, usuario["tipo_usuario"])
-        y -= 20
+    archivoPdf.setFont('Helvetica',12)
+    archivoPdf.drawString(160,620, f'{usuarioInformacion.username}')
+    archivoPdf.drawString(160,605, f'{usuarioInformacion.first_name}')
+    archivoPdf.drawString(160,590, f'{usuarioInformacion.last_name}')
+    archivoPdf.drawString(160,575, f'{usuarioInformacion.email}')
 
-    # Guarda y cierra el PDF
-    c.save()
+    archivoPdf.setFont('Helvetica-Bold',12)
+    archivoPdf.drawString(300,620, 'Tipo de usuario')
+    archivoPdf.drawString(300,605, 'Profesion del usuario')
+    archivoPdf.drawString(300,590, 'Nro de celular')
+    archivoPdf.drawString(300,575, 'Fecha de ingreso')
+
+    archivoPdf.drawString(425,620, ':')
+    archivoPdf.drawString(425,605, ':')
+    archivoPdf.drawString(425,590, ':')
+    archivoPdf.drawString(425,575, ':')
+
+    archivoPdf.setFont('Helvetica',12)
+    archivoPdf.drawString(430,620, f'{usuarioInformacion.datosusuario.tipoUsuario}')
+    archivoPdf.drawString(430,605, f'{usuarioInformacion.datosusuario.profesionUsuario}')
+    archivoPdf.drawString(430,590, f'{usuarioInformacion.datosusuario.nroCelular}')
+    archivoPdf.drawString(430,575, f'{usuarioInformacion.datosusuario.fechaIngreso.strftime("%d-%m-%Y")}')
+
+    lista_x = [40,550]
+    lista_y = [500,540]
+    archivoPdf.setStrokeColorRGB(0,0,1)
+
+    for tarea in tareasUsuario:
+        archivoPdf.grid(lista_x,lista_y)
+        archivoPdf.setFont('Helvetica',12)
+        archivoPdf.drawString(lista_x[0] + 20, lista_y[1]-15, f'{tarea.fechaInicio}')
+        archivoPdf.drawString(lista_x[0] + 120, lista_y[1]-15, f'{tarea.fechaFin}')
+        archivoPdf.drawString(lista_x[0] + 220, lista_y[1]-15, f'{tarea.estadoTarea}')
+        archivoPdf.drawString(lista_x[0] + 20, lista_y[1]-35, f'{tarea.descripcionTarea}')
+        lista_y[0] = lista_y[0] - 60
+        lista_y[1] = lista_y[1] - 60
+    archivoPdf.save()
+
+
     nombreArchivo = 'reporteUsuarios.pdf'
     reporteUsuarios=open(nombreArchivo,'rb')
     return FileResponse(reporteUsuarios,as_attachment=True)

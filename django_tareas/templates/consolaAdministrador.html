@@ -10,8 +10,9 @@
         <!--Importar fontAwesome-->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <script src="{% static 'consolaAdministrador.js' %}"></script>
+        <script src="{% static 'informacionUsuario.js' %}"></script>
     </head>
-    <body>
+    <body> 
         <div class="bg-primary">
             <div class="container">
                 <div class="row justify-content-between align-items-center">
@@ -163,25 +164,29 @@
                 <div class="row form-group justify-content-around mb-3">
                     <div class="col-5">
                         <label>Nombre :</label>
-                        <input class="form-control" type="text" name="nombreUsuario" required>
+                        <input class="form-control" type="text" id="usernameUsuario" name="usernameUsuario"  value="{{usuarioInfo.last_name}}" readonly>
                     </div>
                     <div class="col-5">
                         <label>Apellido :</label>
-                        <input class="form-control" type="text" name="apellidoUsuario" required>
+                        <input class="form-control" type="text" name="apellidoUsuario" readonly>
                     </div>
                 </div>
                 <div class="row form-group justify-content-around mb-3">
                     <div class="col-5">
                         <label>Email :</label>
-                        <input class="form-control" type="email" name="emailUsuario" required>
+                        <input class="form-control" type="email" name="emailUsuario" readonly>
                     </div>
                     <div class="col-5">
                         <label>Nro de celular :</label>
                         <input class="form-control" type="text" name="nroCelular" required>
                     </div>
                     <div class="col-5">
+                        <label>Profesion</label>
+                        <input class="form-control" type="text" name="profesionUsuario" required>
+                    </div>
+                    <div class="col-5">
                         <label>Fecha  :</label>
-                        <input class="form-control" type="date" id="fechaIngresoDetalle"  readonly>
+                        <input class="form-control" type="date" id="fechaIngresoDetalle" {{ usuarioInfo.datosusuario.fechaIngreso|date:"Y-m-d" }} readonly>
                     </div>
                 </div>
             </div>

@@ -15,6 +15,7 @@ urlpatterns = [
     path('conseguirInfoUsuario',views.conseguirInfoUsuario,name='conseguirInfoUsuario'),
     path('eliminarTarea/<str:idTarea>&<str:idUsuario>',views.eliminarTarea,name='eliminarTarea'),
     path('descargarTareas/<str:idUsuario>',views.descargarTareas,name='descargarTareas'),
+    path('descargarReporteUsuarios/<str:idUsuario>',views.descargarReporteUsuarios,name='descargarReporteUsuarios'),
     path('react', views.react, name='react'),
     path('iterarReact',views.iterarReact,name='iterarReact'),
     path('publicarComentario',views.publicarComentario,name='publicarComentario'),
